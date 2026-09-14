@@ -17,10 +17,10 @@ const _jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Alex Mercer | Pengembang Web Full-Stack",
+  title: "Anugrah Azmi | Portofolio",
   description:
-    "Portofolio Alex Mercer, pengembang web full-stack yang membangun pengalaman digital yang cepat, mudah diakses, dan memukau dengan React, Next.js, dan TypeScript.",
-  keywords: ["pengembang web", "full-stack", "React", "Next.js", "TypeScript", "portofolio", "UI/UX", "Alex Mercer"],
+    "Portofolio Muhammad Anugrah Tsabitul Azmi, Lulusan baru D3 Teknik Informatika di Politeknik Negeri Banjarmasin.",
+  keywords: ["Anugrah", "Azmi", "D3 Teknik Informatika", "Politeknik Negeri Banjarmasin", "Next.js", "TypeScript", "portofolio"],
   generator: "v0.app",
 }
 
