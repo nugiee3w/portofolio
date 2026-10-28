@@ -294,7 +294,7 @@ export function FlavorCarousel() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="relative w-full max-w-3xl"
+                className="relative w-full max-w-4xl"
                 style={{ perspective: 1000 }}
               >
                 <motion.div
@@ -305,7 +305,7 @@ export function FlavorCarousel() {
                 >
                   <div className="grid md:grid-cols-2 gap-6 items-center">
                     <motion.div
-                      className="relative aspect-[3/4] flex items-center justify-center rounded-2xl overflow-hidden bg-[#121212]/5 border border-[#121212]/10"
+                      className="relative aspect-video flex items-center justify-center rounded-2xl overflow-hidden bg-[#121212]/5 border border-[#121212]/10 shadow-inner group"
                       whileHover={{ scale: 1.02 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     >
@@ -313,7 +313,7 @@ export function FlavorCarousel() {
                         src={currentFlavor.image}
                         alt={`Mockup sistem ${currentFlavor.name}`}
                         fill
-                        className="object-contain p-2"
+                        className="object-contain p-2 sm:p-3 transition-transform duration-500 group-hover:scale-105"
                       />
                     </motion.div>
 
