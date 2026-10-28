@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion"
 import { useRef } from "react"
 import Image from "next/image"
+import { useLenis } from "lenis/react"
 
 const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 }
 
@@ -36,6 +37,17 @@ const scaleInVariants: Variants = {
 
 export function HeroSection() {
   const ref = useRef(null)
+  const lenis = useLenis()
+
+  const scrollToSection = (id: string) => {
+    const element = document.querySelector<HTMLElement>(id)
+    if (element && lenis) {
+      lenis.scrollTo(element, { offset: -80 })
+    } else if (element) {
+      element.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -143,7 +155,8 @@ export function HeroSection() {
               className="flex flex-wrap gap-3 pt-2"
             >
               <motion.button
-                className="bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide flex items-center gap-2 group relative overflow-hidden"
+                onClick={() => scrollToSection("#flavours")}
+                className="bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide flex items-center gap-2 group relative overflow-hidden cursor-pointer"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -167,7 +180,8 @@ export function HeroSection() {
                 </motion.svg>
               </motion.button>
               <motion.button
-                className="border-2 border-[#121212] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide relative overflow-hidden"
+                onClick={() => scrollToSection("#careers")}
+                className="border-2 border-[#121212] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide relative overflow-hidden cursor-pointer"
                 whileHover={{ scale: 1.02, backgroundColor: "#121212", color: "#fff" }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
