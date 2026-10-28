@@ -1,12 +1,12 @@
 "use client"
 
-import { motion, useScroll, useTransform, useSpring } from "framer-motion"
+import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion"
 import { useRef } from "react"
 import Image from "next/image"
 
 const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 }
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: (i: number) => ({
     opacity: 1,
@@ -19,7 +19,7 @@ const fadeUpVariants = {
   }),
 }
 
-const scaleInVariants = {
+const scaleInVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8, rotate: -10 },
   visible: {
     opacity: 1,
@@ -53,9 +53,6 @@ export function HeroSection() {
   const rawScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.9])
   const scale = useSpring(rawScale, springConfig)
 
-  const rawOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
-  const opacity = useSpring(rawOpacity, springConfig)
-
   return (
     <section
       id="hero"
@@ -87,7 +84,7 @@ export function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-12">
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           {/* Text Content */}
-          <motion.div style={{ opacity }} className="space-y-5">
+          <div className="space-y-5">
             <motion.div
               variants={fadeUpVariants}
               initial="hidden"
@@ -95,11 +92,6 @@ export function HeroSection() {
               custom={0}
               className="inline-flex items-center gap-2 bg-[#121212] text-white px-3 py-1.5 rounded-full text-xs font-mono tracking-wider"
             >
-              <motion.span
-                className="w-2 h-2 bg-[#AFFF00] rounded-full"
-                animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              />
               FRESH GRADUATED INFORMATICS ENINEERING
             </motion.div>
 
@@ -204,39 +196,20 @@ export function HeroSection() {
                 </motion.div>
               ))}
             </motion.div>
-          </motion.div>
+          </div>
 
           <motion.div style={{ y, scale }} className="relative flex justify-center">
             <motion.div variants={scaleInVariants} initial="hidden" animate="visible" className="relative">
-              <motion.div
-                className="absolute inset-0 bg-[#84cc16]/30 blur-[80px] rounded-full scale-75"
-                animate={{
-                  scale: [0.75, 0.85, 0.75],
-                  opacity: [0.3, 0.5, 0.3],
-                }}
-                transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              />
-
-              <motion.div
-                animate={{
-                  y: [0, -15, 0],
-                  rotate: [0, 2, 0],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              >
+              <div>
                 <Image
                   src="/images/hero-devsetup.png"
                   alt="Laptop displaying code — Alex Mercer's development setup"
                   width={520}
                   height={390}
-                  className="relative z-10 drop-shadow-2xl"
+                  className="relative z-10"
                   priority
                 />
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         </div>

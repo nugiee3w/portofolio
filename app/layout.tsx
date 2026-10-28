@@ -6,14 +6,16 @@ import { LenisProvider } from "@/components/lenis-provider"
 import ClickSpark from "@/components/click-spark"
 import "./globals.css"
 
-const _inter = Inter({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
 })
 
-const _jetbrainsMono = JetBrains_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -35,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`font-sans antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <ClickSpark
           sparkColor="#AFFF00"
           sparkSize={12}

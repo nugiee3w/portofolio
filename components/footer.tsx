@@ -1,10 +1,10 @@
 "use client"
 
-import { motion, useInView } from "framer-motion"
+import { motion, useInView, type Variants } from "framer-motion"
 import { useState, useRef } from "react"
 import Link from "next/link"
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -15,7 +15,7 @@ const containerVariants = {
   },
 }
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
@@ -29,14 +29,61 @@ const itemVariants = {
 }
 
 export function Footer() {
-  const [email, setEmail] = useState("")
+  const [sender, setSender] = useState("")
+  const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const footerRef = useRef(null)
   const isInView = useInView(footerRef, { once: true, margin: "-100px" })
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!sender && !message) {
+      window.open("mailto:m.anugrahazmi@gmail.com", "_blank")
+      return
+    }
+
     setIsSubmitting(true)
-    setTimeout(() => setIsSubmitting(false), 2000)
+    setSubmitStatus("idle")
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "6531bed9-527b-4ab0-a9f5-d09a1e093840",
+          subject: "Pesan Baru dari Portofolio Web",
+          from_name: sender || "Pengunjung Portofolio",
+          email: sender.includes("@") ? sender : undefined,
+          name: sender,
+          message: `Pengirim / Kontak: ${sender}\n\nPesan:\n${message || "Halo, saya tertarik berkolaborasi dengan Anda."}`,
+        }),
+      })
+
+      const data = await res.json()
+      if (data.success) {
+        setSubmitStatus("success")
+        setSender("")
+        setMessage("")
+      } else {
+        // Jika API key belum dipasang / gagal, fallback buka mailto langsung secara mulus
+        const subject = encodeURIComponent("Halo, saya ingin berkolaborasi")
+        const body = encodeURIComponent(`Halo Anugrah,\n\nNama/Kontak: ${sender}\n\nPesan:\n${message}\n`)
+        window.open(`mailto:m.anugrahazmi@gmail.com?subject=${subject}&body=${body}`, "_blank")
+        setSubmitStatus("success")
+      }
+    } catch {
+      // Fallback jika offline atau terhalang adblocker
+      const subject = encodeURIComponent("Halo, saya ingin berkolaborasi")
+      const body = encodeURIComponent(`Halo Anugrah,\n\nNama/Kontak: ${sender}\n\nPesan:\n${message}\n`)
+      window.open(`mailto:m.anugrahazmi@gmail.com?subject=${subject}&body=${body}`, "_blank")
+      setSubmitStatus("success")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const footerLinks = [
@@ -58,7 +105,7 @@ export function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-[0.9] overflow-hidden">
             <motion.span
@@ -80,6 +127,9 @@ export function Footer() {
               BERKOLABORASI
             </motion.span>
           </h2>
+          <p className="text-white/60 font-mono text-xs max-w-md mx-auto mt-4">
+            Punya ide proyek, tawaran kerjasama, atau sekadar ingin menyapa? Kirim pesan langsung di bawah ini.
+          </p>
         </motion.div>
 
         <motion.div
@@ -89,52 +139,61 @@ export function Footer() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="max-w-xl mx-auto mb-12"
         >
-          <div className="flex flex-col sm:flex-row gap-3">
-            <motion.div className="flex-1 relative" whileFocus={{ scale: 1.02 }}>
-              <motion.input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@anda.com"
-                className="w-full bg-white/5 border-2 border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/40 font-mono text-sm focus:outline-none focus:border-[#AFFF00] transition-all duration-300"
-                whileFocus={{ borderColor: "#AFFF00" }}
-              />
-              <motion.div
-                className="absolute inset-0 rounded-xl pointer-events-none"
-                animate={email.length > 0 ? { boxShadow: "0 0 20px rgba(175,255,0,0.2)" } : { boxShadow: "none" }}
-              />
-            </motion.div>
-            <motion.button
-              className="bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-xl font-bold text-sm tracking-wide whitespace-nowrap relative overflow-hidden"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              onClick={handleSubmit}
-            >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.5 }}
-              />
-              <motion.span
-                className="relative z-10"
-                animate={isSubmitting ? { opacity: [1, 0.5, 1] } : {}}
-                transition={{ duration: 0.5, repeat: isSubmitting ? Number.POSITIVE_INFINITY : 0 }}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={sender}
+                  onChange={(e) => setSender(e.target.value)}
+                  placeholder="Nama atau Email Anda..."
+                  className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/40 font-mono text-sm focus:outline-none focus:border-[#AFFF00] transition-all duration-300"
+                />
+              </div>
+              <motion.button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-xl font-bold text-sm tracking-wide whitespace-nowrap relative overflow-hidden flex items-center justify-center disabled:opacity-50"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                {isSubmitting ? "Mengirim..." : "Kirim Pesan"}
-              </motion.span>
-            </motion.button>
-          </div>
-          <motion.p
-            className="text-white/40 font-mono text-xs mt-2 text-center"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            Silakan berikan kritik dan saran kepada Saya mengenai halaman website ini
-          </motion.p>
+                <span className="relative z-10">
+                  {isSubmitting ? "Mengirim..." : "Kirim Pesan"}
+                </span>
+              </motion.button>
+            </div>
+
+            <div className="relative">
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={3}
+                placeholder="Tulis pesan atau topik yang ingin didiskusikan..."
+                className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/40 font-mono text-sm focus:outline-none focus:border-[#AFFF00] transition-all duration-300 resize-none"
+              />
+            </div>
+
+            {submitStatus === "success" && (
+              <motion.p
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-[#AFFF00] font-mono text-xs text-center"
+              >
+                ✓ Pesan siap dikirim / terkirim! Terima kasih telah menghubungi.
+              </motion.p>
+            )}
+          </form>
+
+          <p className="text-white/40 font-mono text-xs mt-3 text-center">
+            Atau hubungi langsung melalui{" "}
+            <a
+              href="mailto:m.anugrahazmi@gmail.com"
+              className="text-[#AFFF00] hover:underline"
+            >
+              m.anugrahazmi@gmail.com
+            </a>
+          </p>
         </motion.div>
 
         <motion.div
@@ -162,7 +221,19 @@ export function Footer() {
                   <li key={item}>
                     <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
                       <Link
-                        href="#"
+                        href={
+                          item === "Email"
+                            ? "mailto:m.anugrahazmi@gmail.com"
+                            : item === "GitHub"
+                            ? "https://github.com/nugiee3w"
+                            : item === "LinkedIn"
+                            ? "https://linkedin.com/in/m-anugrah"
+                            : item === "Instagram"
+                            ? "https://www.instagram.com/nugi.ja"
+                            : "#"
+                        }
+                        target={item !== "Email" ? "_blank" : undefined}
+                        rel={item !== "Email" ? "noopener noreferrer" : undefined}
                         className="text-white/60 hover:text-[#AFFF00] font-mono text-xs transition-colors inline-block"
                       >
                         {item}
@@ -193,7 +264,31 @@ export function Footer() {
             </span>
           </motion.div>
 
-          <p className="text-white/40 font-mono text-xs">© 2026 Anugrah Azmi</p>
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-white/40 font-mono text-xs text-center md:text-right">
+            <p>© 2026 Anugrah Azmi</p>
+            <span className="hidden md:inline text-white/20">•</span>
+            <p className="text-[11px] text-white/30">
+              Template inspired by{" "}
+              <a
+                href="https://v0-gigi-energy-drink-landing-page.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/50 hover:text-[#AFFF00] underline underline-offset-2 transition-colors"
+              >
+                Gigi Landing Page
+              </a>{" "}
+              by{" "}
+              <a
+                href="https://v0.app/@rajoninternet"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#AFFF00]/80 hover:text-[#AFFF00] underline underline-offset-2 transition-colors"
+              >
+                @rajoninternet
+              </a>{" "}
+              on Vercel
+            </p>
+          </div>
 
         </motion.div>
       </div>

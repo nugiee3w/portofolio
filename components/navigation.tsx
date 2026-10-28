@@ -53,7 +53,7 @@ export function Navigation() {
   }, [])
 
   const scrollToSection = (id: string) => {
-    const element = document.querySelector(id)
+    const element = document.querySelector<HTMLElement>(id)
     if (element && lenis) {
       lenis.scrollTo(element, { offset: -100 })
     }
@@ -62,9 +62,10 @@ export function Navigation() {
 
   const navLinks = [
     { label: "Beranda", href: "#hero" },
+    { label: "Tentang Saya", href: "#about-me" },
     { label: "Proyek", href: "#flavours" },
     { label: "Keahlian", href: "#formula" },
-    { label: "Sertifikasi", href: "#about" },
+    { label: "Sertifikasi", href: "#sertifikasi" },
     { label: "Kontak", href: "#careers" },
   ]
 
@@ -124,8 +125,12 @@ export function Navigation() {
           ))}
         </div>
 
-        <motion.button
-          className="hidden md:block bg-[#AFFF00] text-[#121212] px-6 py-2.5 rounded-full font-bold text-sm tracking-wide relative overflow-hidden"
+        <motion.a
+          href="/cv.pdf"
+          download="Muhammad-Anugrah-Tsabitul-Azmi-CV.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden md:inline-flex items-center justify-center bg-[#AFFF00] text-[#121212] px-6 py-2.5 rounded-full font-bold text-sm tracking-wide relative overflow-hidden cursor-pointer"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -147,7 +152,7 @@ export function Navigation() {
             transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, repeatDelay: 3 }}
           />
           <span className="relative z-10">Unduh CV</span>
-        </motion.button>
+        </motion.a>
 
         <motion.button
           className="md:hidden p-2"
@@ -194,7 +199,7 @@ export function Navigation() {
                 <motion.button
                   key={item.label}
                   onClick={() => scrollToSection(item.href)}
-                  className="block w-full text-left text-white/80 hover:text-[#AFFF00] text-lg font-medium py-2"
+                  className="block w-full text-left text-white/80 hover:text-[#AFFF00] text-lg font-medium py-2 cursor-pointer"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
@@ -202,14 +207,19 @@ export function Navigation() {
                   {item.label}
                 </motion.button>
               ))}
-              <motion.button
-                className="w-full bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide mt-4"
+              <motion.a
+                href="/cv.pdf"
+                download="Muhammad-Anugrah-Tsabitul-Azmi-CV.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="inline-flex items-center justify-center w-full bg-[#AFFF00] text-[#121212] px-6 py-3 rounded-full font-bold text-sm tracking-wide mt-4 cursor-pointer"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 Unduh CV
-              </motion.button>
+              </motion.a>
             </div>
           </motion.div>
         )}

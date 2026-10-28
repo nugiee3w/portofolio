@@ -134,6 +134,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  p {
+    font-family: var(--font-mono);
+  }
 }
 
 /* Custom animations for GiGi */
@@ -208,4 +211,14 @@
   opacity: 0.03;
   pointer-events: none;
   animation: grain 8s steps(10) infinite;
+}
+
+/* Hide scrollbar while preserving scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

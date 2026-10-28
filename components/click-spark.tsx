@@ -33,7 +33,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sparksRef = useRef<Spark[]>([])
-  const startTimeRef = useRef<number | null>(null)
+  const animatingRef = useRef(false)
+  const animFrameIdRef = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -65,6 +66,9 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     return () => {
       ro.disconnect()
       clearTimeout(resizeTimeout)
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current)
+      }
     }
   }, [])
 
@@ -84,18 +88,19 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     [easing],
   )
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    let animationId: number
-
-    const draw = (timestamp: number) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp
+  const draw = useCallback(
+    (timestamp: number) => {
+      const canvas = canvasRef.current
+      if (!canvas) {
+        animatingRef.current = false
+        return
       }
+      const ctx = canvas.getContext("2d")
+      if (!ctx) {
+        animatingRef.current = false
+        return
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       sparksRef.current = sparksRef.current.filter((spark: Spark) => {
@@ -125,15 +130,16 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
         return true
       })
 
-      animationId = requestAnimationFrame(draw)
-    }
-
-    animationId = requestAnimationFrame(draw)
-
-    return () => {
-      cancelAnimationFrame(animationId)
-    }
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale])
+      if (sparksRef.current.length > 0) {
+        animFrameIdRef.current = requestAnimationFrame(draw)
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        animatingRef.current = false
+        animFrameIdRef.current = null
+      }
+    },
+    [sparkColor, sparkSize, sparkRadius, duration, easeFunc, extraScale],
+  )
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     const canvas = canvasRef.current
@@ -151,6 +157,11 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     }))
 
     sparksRef.current.push(...newSparks)
+
+    if (!animatingRef.current) {
+      animatingRef.current = true
+      animFrameIdRef.current = requestAnimationFrame(draw)
+    }
   }
 
   return (
